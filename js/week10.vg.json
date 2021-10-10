@@ -1,0 +1,127 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 500,
+  "height": 500,
+  "title": "COVID-19 Deaths per Country (22 Sep 2021)",
+  "data": {
+    "url": "https://raw.githubusercontent.com/allenliu2021/week10_homework/main/week10data.csv"
+  },
+  "params": [
+    {
+      "name": "Population_Above",
+      "value": 0,
+      "bind": {
+        "input": "range",
+        "min": 0,
+        "max": 100000000,
+        "step": 1000000,
+        "name": "Minimum Population: "
+      }
+    }
+  ],
+  "transform": [
+    {"filter": "datum.gdp_per_capita > 0"},
+    {"filter": "datum.Deaths > 0"},
+    {"filter": "datum.Population > Population_Above"}
+  ],
+  "encoding": {
+    "x": {
+      "field": "gdp_per_capita",
+      "type": "quantitative",
+      "title": "Gdp per capita",
+      "axis": {"tickCount": 3},
+      "scale": {"type": "log", "domain": [100, 100000]}
+    },
+    "y": {
+      "field": "Deaths",
+      "type": "quantitative",
+      "axis": {"tickCount": 2},
+      "scale": {"type": "log", "domain": [1, 1000000]}
+    }
+  },
+  "layer": [
+    {
+      "selection": {
+        "continent_highlight": {
+          "type": "multi",
+          "fields": ["Continent"],
+          "bind": "legend"
+        }
+      },
+      "mark": "circle",
+      "encoding": {
+        "size": {
+          "field": "Population",
+          "type": "quantitative",
+          "scale": {
+            "type": "threshold",
+            "domain": [1000000, 10000000, 50000000, 100000000, 500000000],
+            "range": [10, 50, 150, 200, 300, 400]
+          },
+          "legend": {"format": ".1s"}
+        },
+        "color": {
+          "field": "Continent",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "North America",
+              "South America",
+              "Europe",
+              "Africa",
+              "Asia",
+              "Oceania"
+            ],
+            "range": [
+              "#e41a1c",
+              "#984ea3",
+              "#ff7f00",
+              "#a6cee3",
+              "#377eb8",
+              "#a65628"
+            ]
+          }
+        },
+        "opacity": {
+          "condition": {"selection": "continent_highlight", "value": 0.6},
+          "value": 0.2
+        },
+        "tooltip": [
+          {"field": "Country", "type": "nominal"},
+          {"field": "Continent", "type": "nominal"},
+          {"field": "gdp_per_capita", "type": "quantitative", "format": ","},
+          {"field": "Deaths", "type": "quantitative", "format": ","}, {"field": "Population", "type": "quantitative", "format": ","}
+          
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "baseline": "middle",
+        "dx": -12,
+        "fontSize": 11.5,
+        "fontStyle": "italic"
+      },
+      "encoding": {
+        "text": {"field": "Country", "type": "nominal"},
+        "color": {"value": "black"},
+        "opacity": {
+          "condition": {
+            "test": "datum['Country'] == 'India' || datum['Country'] == 'Singapore' || datum['Country'] == 'Australia' || datum['Country'] == 'New Zealand' || datum['Country'] == 'Russia' || datum['Country'] == 'Yemen' ||  datum['Country'] == 'United States'",
+            "value": 1
+          },
+          "value": 0
+        },
+        "tooltip": [
+          {"field": "Country", "type": "nominal"},
+          {"field": "Continent", "type": "nominal"},
+          {"field": "gdp_per_capita", "type": "quantitative", "format": ","},
+          {"field": "Deaths", "type": "quantitative", "format": ","},
+          {"field": "Population", "type": "quantitative", "format": ","}
+        ]
+      }
+    }
+  ]
+}
